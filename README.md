@@ -1,13 +1,20 @@
 # pbench
-This is a Maven Java Project.
+A java based HTTP request load generator
 
-Run:
-pass in the program argument like:
--t 10 -l 3 -q 300 "http://10.189.100.42:8004/users?search=n&with=ns&byPassThroughMode=false&@{user_id}=1&limit=2000" 
+## Build and install
+```bash 
+mvn install
+```
+## Usage
+```bash
+java -jar target/pbench-1.0-SNAPSHOT.jar -t 10 -l INFO -b 1 -q 300 -i request_sample_5.csv "http://example.com"
+```
 
-Arguments Specification:
--t: test time in seconds
--d: send request in ms of one second, value range [1, 1000]
--q: QPS
--v: view response content
--l: print info every N loops
+## Arguments Specification:
+* -t: test time in seconds
+* -v: view response content
+* -q: QPS
+* -g: the number of seconds in a group, all the request in a group will be distributed evenly into small windows and sent
+out at the beginning of each window.
+* -b: number of batches/windows per group,
+* -l: print info every N loops

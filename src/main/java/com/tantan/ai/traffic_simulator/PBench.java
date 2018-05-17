@@ -42,6 +42,7 @@ public class PBench {
     private int windowSize = 1000;   // store -d param value
     private int print_loops = 10;   // store -p param value
     private int numSeconds = 100;        // -n number of groups/seconds in the test
+    private int timeOutLimit = 3000;        // -o number of milliseconds for time out
     private Integer groupSize = null;      // -g  number of seconds in a group
     private int numBatchPerGroup = 1; // -b  break down the requests in the same group into batches
     private String _requestLogFile = "requestLog.csv";
@@ -105,6 +106,9 @@ public class PBench {
             } else if (cmd.equals("-p")) {
                 value = argv[++i];
                 print_loops = Integer.parseInt(value);
+            }  else if (cmd.equals("-o")) {
+                value = argv[++i];
+                timeOutLimit = Integer.parseInt(value);
             } else if (cmd.equals("-l")) {
                 value = argv[++i];
                 logLevel = LogLevel.valueOf(value.toUpperCase());
@@ -174,7 +178,7 @@ public class PBench {
             // break the requests down to small windows
             for (int i=0; i < numBatchPerGroup; i++) {
                 final long start = System.currentTimeMillis();
-                println("New batch of requests starting at " + start);
+                println("New batch of requests starting at " + start + " containing " + requestPerWindow + " requests");
                 for(int j=0; j<requestPerWindow; j++) {
                     long userId = mergerRequestParamsList.get(i * requestPerWindow + j).getUser_id();
                     HttpGet request = new HttpGet(getFullUrl(userId));
@@ -259,11 +263,11 @@ public class PBench {
     }
 
 
-    private static CloseableHttpAsyncClient getClient() {
+    private CloseableHttpAsyncClient getClient() {
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(30000)
-                .setSocketTimeout(30000)
-                .setConnectionRequestTimeout(10000)
+                .setConnectTimeout(timeOutLimit)
+                .setSocketTimeout(timeOutLimit)
+                .setConnectionRequestTimeout(timeOutLimit)
                 .build();
 
         //配置io线程
